@@ -16,7 +16,7 @@ function love.draw()
 	-- body
 	escalonamento_rrobin()
 	if(atual == "cpu-bound")then
-		auxcpu = auxcpu+1/100
+		auxcpu = auxcpu+1/100 -- tempo que cada processo e executado
 		love.graphics.print(apoio)
 		love.graphics.print ("temp CPU: "..auxcpu)
 		
@@ -27,14 +27,14 @@ function love.draw()
 	end
 end
 
-function escalonamento_rrobin()
+function escalonamento_rrobin() -- funcao escalonador round-robin
 	if(atual == "io-bound") then
-		if(os.time()-tempo>0.4) then
-			tempo = os.time()
-			atual = "cpu-bound"
+		if(os.time()-tempo>0.4) then -- tempo que o I/O fica executando na CPU
+			tempo = os.time() -- quando o tempo termina a variavel tempo e atualizada 
+			atual = "cpu-bound" -- variavel atual muda
 		end
 	else
-		if(os.time() - tempo>5) then
+		if(os.time() - tempo>5) then -- tempo que o CPU-Bound fica executando na CPU
 			tempo = os.time()
 			atual = "io-bound"
 		end

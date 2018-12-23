@@ -1,30 +1,37 @@
 
-function love.load( ... )
-	-- body
-	auxcpu = 0
-	auxio = 0
+local cpu_bound = require("processos/cpu")
+local io_bound = require("processos/io")
+
+
+function love.load()
+	player1 = cpu_bound.novo(0)
+	player2 = io_bound.novo(0)
 	atual = "cpu-bound"
 	tempo = os.time()
-	apoio = "\ncpu-bound executando\n"
+	auxcpu = 0 -- auxiliar de cotagem de tempo cpu-bound
+	auxio = 0 -- auxiliar de contagem de tempo io-bound
+
 end
 
 function love.update( dt )
 	-- body
 end
 
-function love.draw()
+function love.draw(  )
 	-- body
 	escalonamento_rrobin()
 	if(atual == "cpu-bound")then
 		auxcpu = auxcpu+1/100 -- tempo que cada processo e executado
-		love.graphics.print(apoio)
-		love.graphics.print ("temp CPU: "..auxcpu)
+		love.graphics.print("\ncpu-bound executando".."\n".."PID: "..player1.pid.."\n")
+		love.graphics.print("temp CPU: ".. auxcpu)
+
 		
 	else
 		auxio = auxio+1/100
-		love.graphics.print("\nio-bound executando\n")
-		love.graphics.print("tem CPU: "..auxio)
+		love.graphics.print("\nio-bound executando\n".."PID: "..player2.pid.."\n")
+		love.graphics.print("temp CPU: "..auxio)
 	end
+	
 end
 
 function escalonamento_rrobin() -- funcao escalonador round-robin
@@ -40,6 +47,4 @@ function escalonamento_rrobin() -- funcao escalonador round-robin
 		end
 	end
 end
-
-
 

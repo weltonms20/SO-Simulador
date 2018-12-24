@@ -479,6 +479,14 @@ end
 
 function menu_processamento()
 	
+	love.graphics.draw(buttom_rr.img,buttom_rr.x,buttom_rr.y)
+	love.graphics.draw(buttom_pr.img,buttom_pr.x,buttom_pr.y)
+	love.graphics.draw(buttom_mf.img,buttom_mf.x,buttom_mf.y)
+	love.graphics.draw(buttom_l.img,buttom_l.x,buttom_l.y)
+	love.graphics.draw(buttom_rr.img,buttom_rr.x,buttom_rr.y)
+	love.graphics.draw(buttom_pr.img,buttom_pr.x,buttom_pr.y)
+	love.graphics.draw(buttom_mf.img,buttom_mf.x,buttom_mf.y)
+	love.graphics.draw(buttom_l.img,buttom_l.x,buttom_l.y)
 	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,600)
 	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,620)
 	love.graphics.print("Pressione '+' para aumentar a prioridade ",0,640)
@@ -494,12 +502,8 @@ end
 function menu_start()
 	love.graphics.draw(logo,380,60,0,0.3,0.2,0,0)
 	love.graphics.draw(buttom_rr.img,buttom_rr.x,buttom_rr.y)
-	--love.graphics.print("Pressione 'r' para Escalonamento [Round-robin]",0,600)
-	--love.graphics.print("Pressione 'p' para Escalonamento por [Prioridades] ",0,620)
 	love.graphics.draw(buttom_pr.img,buttom_pr.x,buttom_pr.y)
-	--love.graphics.print("Pressione 'f' para Escalonamento por [Múltiplas Filas] ",0,640)
 	love.graphics.draw(buttom_mf.img,buttom_mf.x,buttom_mf.y)
-	--love.graphics.print("Pressione 'l' para Escalonamento por [Loteria] ",0,660)
 	love.graphics.draw(buttom_l.img,buttom_l.x,buttom_l.y)
 
 end

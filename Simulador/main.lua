@@ -26,6 +26,7 @@ local io_bound = require("processos/io")
 --local fila = require("fila") -- nao funcionou
 
 local fila={} -- fila que guarda e processa todos os processos
+local suspensos = {}
 
 local cpu = { -- tabela cpu (talvez precise ai ja deixei pronta)
 	nome="juninho",
@@ -60,7 +61,7 @@ function love.load()
 	cpu.tempo.io = 0 -- auxiliar de contagem de tempo io-bound
 
 	-------------------------------graficos--------------------------------------------------
-
+	cursor = {y=6,base_y=11,pos=1}
 	buttom = love.graphics.newImage("imagens/button.png")
 	grid_buttom = anim8.newGrid(502, 248, buttom:getWidth(), buttom:getHeight())
 	anim = anim8.newAnimation(grid_buttom('1-2',1), 0.1,"pauseAtStart")
@@ -70,12 +71,17 @@ end
 
 function love.update( dt )
 	escalonamento_loteria()
+
 	if(atual~=0 and fila[atual].tipo == "cpu_bound")then
 		cpu.tempo.cpu = cpu.tempo.cpu+dt -- tempo que cada processo e executado
 	else
 		cpu.tempo.io = cpu.tempo.io+dt
 	end
 	-- body
+	if(cursor.pos>#processos)then
+		cursor.pos=#processos
+	end
+	cursor.y= (cursor.base_y*cursor.pos)+cursor.base_y
 end
 
 function love.draw( dt )
@@ -89,38 +95,111 @@ function love.draw( dt )
 		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
 		love.graphics.print("temp CPU: "..cpu.tempo.io)
 	end
-	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,500)
-	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,520)
-	love.graphics.print("Pressione '+' para aumentar a prioridade ",0,540)
-	love.graphics.print("Pressione '-' para dominuir a prioridade ",0,560)
-	love.graphics.print("atual =  "..atual.." proximo = "..espera,0,580)
+	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,600)
+	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,620)
+	love.graphics.print("Pressione '+' para aumentar a prioridade ",0,640)
+	love.graphics.print("Pressione '-' para dominuir a prioridade ",0,660)
+	love.graphics.print("Pressione 'x' para suspendere () o processo  ",0,680)
+	love.graphics.print("Pressione 'q' para encerrar (quit) o processo  ",0,700)
+	love.graphics.print("Pressione 's' para retomar um processo suspenso ",0,720)
+	love.graphics.print("atual =  "..atual.." proximo = "..espera,0,740)
 
-	love.graphics.print("tamanho da fila "..#fila,250,0)
+	love.graphics.print("cursor.pos =  "..cursor.pos,0,760)
+
+	love.graphics.print("Pressione Esq para terminar a simulação",0,780)
+
+--------------------------------------------------filas e processos -------------------------------------
+	love.graphics.print("tamanho da fila "..#fila,300,0)
 	for i=1,#fila do
-		love.graphics.print("fila ["..i.."] "..fila[i].tipo.." pid = "..fila[i].pid,250,11*i)
+		love.graphics.print("fila ["..i.."] "..fila[i].tipo.." pid = "..fila[i].pid.." prioridade = "..fila[i].prioridade,300,11*i)
 	end
+	love.graphics.print("tamanho da tabela de processos suspensos "..#suspensos,600,0)
+	for i=1,#suspensos do
+		love.graphics.print("suspensos ["..i.."] "..suspensos[i].tipo.." pid = "..suspensos[i].pid.." prioridade = "..suspensos[i].prioridade,600,11*i)
+	end
+
+	love.graphics.print("tamanho da tabela de processos "..#fila,1000,0)
+	for i=1,#processos do
+		if(cursor.pos==i)then
+			love.graphics.setColor( 250,0,0)
+		else
+			love.graphics.setColor( 250,250,250)
+		end
+		love.graphics.print("["..i.."] "..processos[i].tipo.." pid = "..processos[i].pid.." status = "..processos[i].status,1000,11*i)
+	end
+	love.graphics.setColor( 250,250,250)
+------------------------------------------------cursor ----------------------------------------------------
+	
+    love.graphics.circle("fill", 990, cursor.y, 6, 10)
+    if(#processos==50)then
+		love.graphics.setColor( 250,0,0)
+		love.graphics.print("ATENCAO LIMITE DE PROCESSOS ALCANCADO",650,600)
+		love.graphics.setColor( 250,250,250)
+    elseif(#processos>40)then
+		love.graphics.setColor( 250,250,0)
+		love.graphics.print("CUIDADO LIMITE DE PROCESSOS EH 50",650,600)
+		love.graphics.setColor( 250,250,250)
+    end
+
 
 end
 
 function love.keypressed(key)
 	if key == "c" then
-		processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
-		adiciona_fila(processos[#processos])
-		atual = primeiro_fila()
-		if(#fila>1)then
-			espera = espera_fila()
+		if(#processos<50)then
+			processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
+			processos[#processos].indice = #processos -- setando o indice dele como o ultimo (apenas para questao de remover)
+			adiciona_fila(processos[#processos])
+			if(#fila<2)then
+				atual = primeiro_fila()
+				fila[atual].status = "processando"
+				if(#fila>1)then
+					espera = espera_fila()
+				end
+			end
 		end
 	elseif key == "i" then
-		processos[#processos+1] = io_bound.novo(prioridade)
-		adiciona_fila(processos[#processos])
-		atual = primeiro_fila()
-		if(#fila>1)then
-			espera = espera_fila()
+		if(#processos<50)then
+			processos[#processos+1] = io_bound.novo(prioridade)
+			processos[#processos].indice = #processos -- setando o indice dele como o ultimo (apenas para questao de remover)
+			adiciona_fila(processos[#processos])
+			atual = primeiro_fila()
+			if(#fila<2)then
+				atual = primeiro_fila()
+				fila[atual].status = "processando"
+				if(#fila>1)then
+					espera = espera_fila()
+				end
+			end
 		end
 	elseif (key == "+" or key == "kp+") then
 		prioridade=prioridade+1
 	elseif (key == "-" or key == "kp-") then
 		prioridade=prioridade-1
+	elseif (key == "up") then
+		if(cursor.pos>1)then
+			cursor.pos = cursor.pos-1
+		end
+	elseif (key == "down") then
+		if(cursor.pos<#processos)then
+			cursor.pos = cursor.pos+1
+		end
+	elseif (key == "escape") then
+		love.event.quit()
+	elseif (key == "q") then--encerrar o processo
+		if(cursor.pos>0)then
+			processos[cursor.pos].status = "encerrar"
+		end		
+	elseif (key == "x") then--suspender o processo
+		if(cursor.pos>0)then
+			processos[cursor.pos].status = "suspender"
+		end			
+	elseif (key == "s") then--suspender o processo
+		if(cursor.pos>0 and processos[cursor.pos].status=="suspender")then
+			processos[cursor.pos].status = "espera"
+			remove_suspenso(processos[cursor.pos].pid)
+			adiciona_fila(processos[cursor.pos])
+		end		
 	end
 end
 
@@ -242,8 +321,22 @@ end
 ]]--
 function proximo_fila()
 	local temp = fila[1]
-	adiciona_fila(temp)--coloca no final da fila
+	if(temp.status=="encerrar")then --remove
+		table.remove(processos,temp.indice)
+	elseif(temp.status=="suspender")then -- suspende
+		suspensos[#suspensos+1] = temp
+	elseif(temp.status=="processando")then
+		adiciona_fila(temp)--coloca no final da fila
+		fila[#fila].status = "espera"
+	end
 	remove_fila(1)--remove o primeiro da fila
+	if(fila[1].status=="encerrar")then -- remove esse processo
+		proximo_fila() -- pula esse processo
+	elseif(fila[1].status=="suspender")then -- suspende tal processo
+		proximo_fila() -- pula esse processo
+	elseif(fila[1].status=="espera")then
+		fila[1].status = "processando"
+	end
 	return fila[1] --retorna o proximo
 end
 function primeiro_fila()
@@ -251,6 +344,15 @@ function primeiro_fila()
 end
 function espera_fila()
 	return 2
+end
+
+function remove_suspenso(id)
+	for i=1,#suspensos do
+		if(suspensos[i].pid==id)then
+			table.remove(suspensos,i)
+			return
+		end
+	end
 end
 
 

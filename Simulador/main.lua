@@ -1,4 +1,4 @@
-
+local anim8 = require 'anim8'
 local cpu_bound = require("processos/cpu")
 local io_bound = require("processos/io")
 --local fila = require("fila")
@@ -34,6 +34,13 @@ function love.load()
 	cpu.tempo.cpu = 0 -- auxiliar de cotagem de tempo cpu-bound
 	cpu.tempo.io = 0 -- auxiliar de contagem de tempo io-bound
 
+	-------------------------------graficos--------------
+
+	buttom = love.graphics.newImage("imagens/button.png")
+	grid_buttom = anim8.newGrid(502, 248, buttom:getWidth(), buttom:getHeight())
+	anim = anim8.newAnimation(grid_buttom('1-2',1), 0.1)
+
+
 end
 
 function love.update( dt )
@@ -46,8 +53,9 @@ function love.update( dt )
 	-- body
 end
 
-function love.draw(  )
+function love.draw( dt )
 	-- body
+	--button(100,100,0.3,0.3,"texto")
 	if(atual~=0 and processos[atual].tipo == "cpu-bound")then
 		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\ncpu-bound executando".."\n".."PID: "..processos[atual].pid.."\n")
 		love.graphics.print("temp CPU: ".. cpu.tempo.cpu.."\n")
@@ -66,6 +74,8 @@ function love.draw(  )
 	
 end
 
+
+-------------------------------------------------------------------------------------------------------------------
 function sorteio()
 	local aux = love.math.random(10)
 	return aux
@@ -192,3 +202,46 @@ end
 function espera_fila()
 	return 2
 end
+
+
+-- ------------------------FUNCOES GRAFICAS-----------------------------
+--[[
+function colisao(obj1X, obj1Y, obj1W, obj1H, obj2X, obj2Y)
+	if (obj2X>obj1X ) then
+		--if(obj2Y>obj1Y and obj2Y < (obj1Y+obj1H)) then
+			return 1
+		--end
+	else
+		return 0
+	end
+end
+
+function button(x,y,w,h,texto,event,param1,param2)
+	--desenha botao
+	love.graphics.print("\n x = "..love.mouse.getX().."\n",300,400)
+	love.graphics.print("\n y = "..love.mouse.getY().."\n",300,420)
+	love.graphics.print("\n x = "..x.."\n",300,440)
+	love.graphics.print(" y = "..y.."\n",300,480)
+	anim:draw(buttom, x, y,0,w,h)
+	if(colisao(x,y,250,72,love.mouse.getX(),love.mouse.getY()))then
+		love.graphics.print("\n colisao\n",300,500)
+		--anim:update(dt)	
+		if(not event)then
+			return
+		end
+		if((not param1) and (not param2))then
+			event()
+		elseif((not param2))then
+			event(param1)
+		elseif((not param1))then
+			event(param2)
+		elseif(param1 and param2)then
+			event(param1,param2)
+		end
+	end
+
+end
+function new_button(x,y,w,h,texto,evento,param1,param2)
+	-- body
+end
+]]--

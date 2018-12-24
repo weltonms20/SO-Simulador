@@ -68,7 +68,7 @@ end
 
 function love.update( dt )
 	escalonamento_loteria()
-	if(atual~=0 and processos[atual].tipo == "cpu_bound")then
+	if(atual~=0 and fila[atual].tipo == "cpu_bound")then
 		cpu.tempo.cpu = cpu.tempo.cpu+dt -- tempo que cada processo e executado
 	else
 		cpu.tempo.io = cpu.tempo.io+dt
@@ -79,12 +79,12 @@ end
 function love.draw( dt )
 	-- body
 	--button(100,100,0.3,0.3,"texto")
-	if(atual~=0 and processos[atual].tipo == "cpu_bound")then
-		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\ncpu-bound executando\n".."PID: "..processos[atual].pid.."\ntime = "..processos[atual].time.."\n status = "..processos[atual].status.."\n prioridade = "..processos[atual].prioridade.."\n")
+	if(atual~=0 and fila[atual].tipo == "cpu_bound")then
+		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\ncpu-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
 		love.graphics.print("temp CPU: ".. cpu.tempo.cpu.."\n")
 		
 	elseif(atual~=0)then
-		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..processos[atual].pid.."\ntime = "..processos[atual].time.."\n status = "..processos[atual].status.."\n prioridade = "..processos[atual].prioridade.."\n")
+		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
 		love.graphics.print("temp CPU: "..cpu.tempo.io)
 	end
 	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,500)
@@ -130,7 +130,7 @@ function sorteio()
 end
 
 function escalonamento_rrobin() -- funcao escalonador round-robin
-	if(atual~=0 and processos[atual].tipo == "io_bound") then
+	if(atual~=0 and fila[atual].tipo == "io_bound") then
 		if(os.time()-tempo>0.4) then -- tempo que o I/O fica executando na CPU
 			tempo = os.time() -- quando o tempo termina a variavel tempo e atualizada 
 			
@@ -146,11 +146,11 @@ function escalonamento_rrobin() -- funcao escalonador round-robin
 end
 
 function escalonamento_prioridades()
-	if(atual~=0 and processos[atual].tipo == "io_bound")then
-		if(atual~=0 and espera~=0 and processos[atual].prioridade > processos[espera].prioridade)then
+	if(atual~=0 and fila[atual].tipo == "io_bound")then
+		if(atual~=0 and espera~=0 and fila[atual].prioridade > fila[espera].prioridade)then
 			proximo_fila()
 		else
-			if(atual~=0 and espera~=0 and processos[atual].prioridade <= processos[espera].prioridade)then
+			if(atual~=0 and espera~=0 and fila[atual].prioridade <= fila[espera].prioridade)then
 				if(os.time()-tempo>0.4)then
 					tempo =os.time()
 					proximo_fila()
@@ -167,7 +167,7 @@ end
 
 function escalonamento_loteria()
 -- body
-	if (atual~=0 and processos[atual].token[numero_random]) then
+	if (atual~=0 and fila[atual].token[numero_random]) then
 		love.graphics.print("\n\n\nToken sorteado: "..numero_random)
 		if(os.time()-tempo>5)then
 			tempo = os.time()
@@ -177,7 +177,7 @@ function escalonamento_loteria()
 			aux = love.math.random(10)
 		end
 
-	elseif(espera~=0 and processos[espera].token[numero_random])then
+	elseif(espera~=0 and fila[espera].token[numero_random])then
 			proximo_fila()
 			love.graphics.print("\n\n\nToken sorteado: "..numero_random)
 			if(os.time()-tempo>1)then
@@ -267,11 +267,12 @@ end
 function button(x,y,w,h,texto,event,param1,param2)
 	--desenha botao
 	love.graphics.print("\n x = "..love.mouse.getX().."\n",300,400)
-	love.graphics.print("\n y = "..love.mouse.getY().."\n",300,420)
+	love.graphics.print("\n yfilae.mouse.getY().."\n",300,420)
 	love.graphics.print("\n x = "..x.."\n",300,440)
 	love.graphics.print(" y = "..y.."\n",300,480)
 	anim:draw(buttom, x, y,0,w,h)
-	if(colisao(x,y,250,72,love.mouse.getX(),love.mouse.getY()))then
+	local mx, my = love.mouse.getPosition( )
+	if(colisao(x,y,250,72,mx,my))then
 		love.graphics.print("\n colisao\n",300,500)
 		--anim:update(dt)	
 		if(not event)then

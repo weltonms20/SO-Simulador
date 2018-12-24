@@ -53,7 +53,10 @@ function love.draw(  )
 		love.graphics.print("temp CPU: "..tempo_io)
 	end
 
-	love.graphics.print("tamanho da fila "..#fila,100,100)
+	love.graphics.print("tamanho da fila "..#fila,250,0)
+	for i=1,#fila do
+		love.graphics.print("fila ["..i.."] "..fila[i].tipo.." pid = "..fila[i].pid,250,11*i)
+	end
 
 	
 	

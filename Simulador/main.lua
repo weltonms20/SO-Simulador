@@ -33,12 +33,12 @@ local cpu = {
 
 function love.load()
 	processos={};
-	processos[#processos+1] = cpu_bound.novo(2)--#processos eh o tamanho do vetor
-	processos[#processos+1] = io_bound.novo(3)
+	--processos[#processos+1] = cpu_bound.novo(2)--#processos eh o tamanho do vetor
+	--processos[#processos+1] = io_bound.novo(3)
 
 	----------------------------------------------------------------------------------------
-	adiciona_fila(processos[1])
-	adiciona_fila(processos[2])
+	--adiciona_fila(processos[1])
+	--adiciona_fila(processos[2])
 
 	if(#fila>0)then
 		atual = primeiro_fila()
@@ -100,9 +100,17 @@ function love.keypressed(key)
 	if key == "c" then
 		processos[#processos+1] = cpu_bound.novo(2)--#processos eh o tamanho do vetor
 		adiciona_fila(processos[#processos])
+		atual = primeiro_fila()
+		if(#fila>1)then
+			espera = espera_fila()
+		end
 	elseif key == "i" then
 		processos[#processos+1] = io_bound.novo(2)
 		adiciona_fila(processos[#processos])
+		atual = primeiro_fila()
+		if(#fila>1)then
+			espera = espera_fila()
+		end
 	end
 end
 

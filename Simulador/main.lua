@@ -30,6 +30,8 @@ local suspensos = {}
 
 local cpu = { -- tabela cpu (talvez precise ai ja deixei pronta)
 	nome="juninho",
+	status="esperando",
+	tipo_escalonamento=nil,
 	tempo={cpu,io},
 	valid="NULL"
 }
@@ -71,22 +73,39 @@ function love.load()
 end
 
 function love.update( dt )
-	escalonamento_loteria()
+	if(cpu.status=="executando")then
+		if(cpu.tipo=="Loteria")then
+			escalonamento_loteria()
+		elseif(cpu.tipo=="Prioridades")then
+			escalonamento_prioridades()
+		elseif(cpu.tipo=="Round-robin")then
+			escalonamento_rrobin()
+		elseif(cpu.tipo=="Filas")then
+			escalonamento_multiplasfilas()
+		end
 
-	if(atual~=0 and fila[atual].tipo == "cpu_bound")then
-		cpu.tempo.cpu = cpu.tempo.cpu+dt -- tempo que cada processo e executado
-	else
-		cpu.tempo.io = cpu.tempo.io+dt
+		if(atual~=0 and fila[atual].tipo == "cpu_bound")then
+			cpu.tempo.cpu = cpu.tempo.cpu+dt -- tempo que cada processo e executado
+		else
+			cpu.tempo.io = cpu.tempo.io+dt
+		end
+		-- body
+		if(cursor.pos>#processos)then
+			cursor.pos=#processos
+		end
+		cursor.y= (cursor.base_y*cursor.pos)+cursor.base_y
+	elseif(cpu.status=="esperando")then --menu inicial
+
 	end
-	-- body
-	if(cursor.pos>#processos)then
-		cursor.pos=#processos
-	end
-	cursor.y= (cursor.base_y*cursor.pos)+cursor.base_y
 end
 
 function love.draw( dt )
 	-- body
+	if(cpu.status=="executando")then
+		menu_processamento()
+	elseif(cpu.status=="esperando")then
+		menu_start()
+	end
 	--button(100,100,0.3,0.3,"texto")
 	if(atual~=0 and fila[atual].tipo == "cpu_bound")then
 		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\ncpu-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
@@ -96,16 +115,6 @@ function love.draw( dt )
 		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
 		love.graphics.print("temp CPU: "..cpu.tempo.io)
 	end
-	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,600)
-	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,620)
-	love.graphics.print("Pressione '+' para aumentar a prioridade ",0,640)
-	love.graphics.print("Pressione '-' para dominuir a prioridade ",0,660)
-	love.graphics.print("Pressione 'x' para suspendere () o processo  ",0,680)
-	love.graphics.print("Pressione 'q' para encerrar (quit) o processo  ",0,700)
-	love.graphics.print("Pressione 's' para retomar um processo suspenso ",0,720)
-	love.graphics.print("atual =  "..atual.." proximo = "..espera,0,740)
-
-	love.graphics.print("cursor.pos =  "..cursor.pos,0,760)
 
 	love.graphics.print("Pressione Esq para terminar a simulação",0,780)
 
@@ -155,78 +164,95 @@ function love.draw( dt )
 end
 
 function love.keypressed(key)
-	if key == "c" then
-		if(#processos<50)then
-			cpu.valid = "valido"
-			processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
-			adiciona_fila(processos[#processos])
-			if(#fila<2)then
-				atual = primeiro_fila()
-				fila[atual].status = "processando"
-				if(#fila>1)then
-					espera = espera_fila()
+	if(cpu.status=="executando")then
+		if key == "c" then
+			if(#processos<50)then
+				cpu.valid = "valido"
+				processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
+				adiciona_fila(processos[#processos])
+				if(#fila<2)then
+					atual = primeiro_fila()
+					fila[atual].status = "processando"
+					if(#fila>1)then
+						espera = espera_fila()
+					end
 				end
+			else
+				cpu.valid = "nao_valido"
 			end
-		else
-			cpu.valid = "nao_valido"
-		end
-	elseif key == "i" then
-		if(#processos<50)then
-			cpu.valid = "valido"
-			processos[#processos+1] = io_bound.novo(prioridade)
-			adiciona_fila(processos[#processos])
-			atual = primeiro_fila()
-			if(#fila<2)then
+		elseif key == "i" then
+			if(#processos<50)then
+				cpu.valid = "valido"
+				processos[#processos+1] = io_bound.novo(prioridade)
+				adiciona_fila(processos[#processos])
 				atual = primeiro_fila()
-				fila[atual].status = "processando"
-				if(#fila>1)then
-					espera = espera_fila()
+				if(#fila<2)then
+					atual = primeiro_fila()
+					fila[atual].status = "processando"
+					if(#fila>1)then
+						espera = espera_fila()
+					end
 				end
+			else
+				cpu.valid = "nao_valido"
 			end
-		else
-			cpu.valid = "nao_valido"
+		elseif (key == "+" or key == "kp+") then
+			prioridade=prioridade+1
+		elseif (key == "-" or key == "kp-") then
+			prioridade=prioridade-1
+		elseif (key == "up") then
+			if(cursor.pos>1)then
+				cursor.pos = cursor.pos-1
+			end
+		elseif (key == "down") then
+			if(cursor.pos<#processos)then
+				cursor.pos = cursor.pos+1
+			end
+		elseif (key == "q") then--encerrar o processo
+			if(cursor.pos>0)then
+				if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
+					processos[cursor.pos].status = "encerrar"
+					cpu.valid = "valido"
+				else
+					cpu.valid = "nao_valido"
+				end
+			end		
+		elseif (key == "x") then--suspender o processo
+			if(cursor.pos>0)then
+				if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
+					processos[cursor.pos].status = "suspender"
+					cpu.valid = "valido"
+				else
+					cpu.valid = "nao_valido"
+				end
+			end			
+		elseif (key == "s") then--suspender o processo
+			if(cursor.pos>0 and processos[cursor.pos].status=="suspender")then
+					cpu.valid = "valido"
+				processos[cursor.pos].status = "espera"
+				remove_suspenso(processos[cursor.pos].pid)
+				adiciona_fila(processos[cursor.pos])
+			else
+				cpu.valid = "nao_valido"
+			end		
 		end
-	elseif (key == "+" or key == "kp+") then
-		prioridade=prioridade+1
-	elseif (key == "-" or key == "kp-") then
-		prioridade=prioridade-1
-	elseif (key == "up") then
-		if(cursor.pos>1)then
-			cursor.pos = cursor.pos-1
+	elseif(cpu.status=="esperando")then
+		if (key == "l") then
+			cpu.tipo="Loteria"
+			cpu.status="executando"
+		elseif (key == "r")then
+			cpu.tipo="Round-robin"
+			cpu.status="executando"
+		elseif (key == "p") then
+			cpu.tipo="Prioridades"
+			cpu.status="executando"
+		elseif (key == "f") then
+			cpu.tipo="Filas"
+			cpu.status="executando"
 		end
-	elseif (key == "down") then
-		if(cursor.pos<#processos)then
-			cursor.pos = cursor.pos+1
-		end
-	elseif (key == "escape") then
+	end
+	if (key == "escape") then--encerra independente de estado
 		love.event.quit()
-	elseif (key == "q") then--encerrar o processo
-		if(cursor.pos>0)then
-			if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
-				processos[cursor.pos].status = "encerrar"
-				cpu.valid = "valido"
-			else
-				cpu.valid = "nao_valido"
-			end
-		end		
-	elseif (key == "x") then--suspender o processo
-		if(cursor.pos>0)then
-			if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
-				processos[cursor.pos].status = "suspender"
-				cpu.valid = "valido"
-			else
-				cpu.valid = "nao_valido"
-			end
-		end			
-	elseif (key == "s") then--suspender o processo
-		if(cursor.pos>0 and processos[cursor.pos].status=="suspender")then
-				cpu.valid = "valido"
-			processos[cursor.pos].status = "espera"
-			remove_suspenso(processos[cursor.pos].pid)
-			adiciona_fila(processos[cursor.pos])
-		else
-			cpu.valid = "nao_valido"
-		end		
 	end
 end
 
@@ -433,3 +459,23 @@ function new_button(x,y,w,h,texto,evento,param1,param2)
 	-- body
 end
 ]]--
+
+function menu_processamento()
+	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,600)
+	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,620)
+	love.graphics.print("Pressione '+' para aumentar a prioridade ",0,640)
+	love.graphics.print("Pressione '-' para dominuir a prioridade ",0,660)
+	love.graphics.print("Pressione 'x' para suspendere () o processo  ",0,680)
+	love.graphics.print("Pressione 'q' para encerrar (quit) o processo  ",0,700)
+	love.graphics.print("Pressione 's' para retomar um processo suspenso ",0,720)
+	love.graphics.print("atual =  "..atual.." proximo = "..espera,0,740)
+
+	love.graphics.print("cursor.pos =  "..cursor.pos,0,760)
+end
+function menu_start()
+	love.graphics.print("Pressione 'r' para Escalonamento [Round-robin]",0,600)
+	love.graphics.print("Pressione 'p' para Escalonamento por [Prioridades] ",0,620)
+	love.graphics.print("Pressione 'f' para Escalonamento por [Múltiplas Filas] ",0,640)
+	love.graphics.print("Pressione 'l' para Escalonamento por [Loteria] ",0,660)
+
+end

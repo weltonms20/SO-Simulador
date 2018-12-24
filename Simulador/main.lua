@@ -1,6 +1,8 @@
 
 local cpu_bound = require("processos/cpu")
 local io_bound = require("processos/io")
+--local fila = require("fila")
+local fila={}
 
 
 function love.load()
@@ -9,8 +11,6 @@ function love.load()
 	processos[#processos+1] = io_bound.novo(3)
 
 	----------------------------------------------------------------------------------------
-
-	fila={}
 	adiciona_fila(processos[1])
 	adiciona_fila(processos[2])
 
@@ -48,10 +48,14 @@ function love.draw(  )
 		love.graphics.print("\ncpu-bound executando".."\n".."PID: "..processos[atual].pid.."\n")
 		love.graphics.print("temp CPU: ".. tempo_cpu.."\n")
 		
-	else
+	elseif(atual~=0)then
 		love.graphics.print("\nio-bound executando\n".."PID: "..processos[atual].pid.."\n")
 		love.graphics.print("temp CPU: "..tempo_io)
 	end
+
+	love.graphics.print("tamanho da fila "..#fila,100,100)
+
+	
 	
 end
 
@@ -61,7 +65,7 @@ function sorteio()
 end
 
 function escalonamento_rrobin() -- funcao escalonador round-robin
-	if(processos[atual].tipo == "io-bound") then
+	if(atual~=0 and processos[atual].tipo == "io-bound") then
 		if(os.time()-tempo>0.4) then -- tempo que o I/O fica executando na CPU
 			tempo = os.time() -- quando o tempo termina a variavel tempo e atualizada 
 			
@@ -77,11 +81,11 @@ function escalonamento_rrobin() -- funcao escalonador round-robin
 end
 
 function escalonamento_prioridades()
-	if(processos[atual].tipo == "io-bound")then
-		if(processos[atual].prioridade > processos[espera].prioridade)then
+	if(atual~=0 and processos[atual].tipo == "io-bound")then
+		if(atual~=0 and espera~=0 and processos[atual].prioridade > processos[espera].prioridade)then
 			proximo_fila()
 		else
-			if(processos[atual].prioridade <= processos[espera].prioridade)then
+			if(atual~=0 and espera~=0 and processos[atual].prioridade <= processos[espera].prioridade)then
 				if(os.time()-tempo>0.4)then
 					tempo =os.time()
 					proximo_fila()
@@ -98,7 +102,7 @@ end
 
 function escalonamento_loteria()
 -- body
-	if (processos[atual].token[numero_random]) then
+	if (atual~=0 and processos[atual].token[numero_random]) then
 		love.graphics.print("\n\n\nToken sorteado: "..numero_random)
 		if(os.time()-tempo>5)then
 			tempo = os.time()
@@ -108,7 +112,7 @@ function escalonamento_loteria()
 			aux = love.math.random(10)
 		end
 
-	elseif(processos[espera].token[numero_random])then
+	elseif(espera~=0 and processos[espera].token[numero_random])then
 			proximo_fila()
 			love.graphics.print("\n\n\nToken sorteado: "..numero_random)
 			if(os.time()-tempo>1)then
@@ -130,8 +134,8 @@ function escalonamento_multiplasfilas()
 
 end
 
-
 -------------------------SISTEMA DE FILA--------------------------
+
 function troca_fila(nodeA, nodeB)
 	fila[nodeA],fila[nodeB] = fila[nodeB],fila[nodeA]
 end
@@ -139,32 +143,36 @@ function adiciona_fila(node)
 	fila[#fila+1] = node
 end
 function remove_fila(indice)
-	fila.remove(indice)
+	table.remove(fila, indice)
 end
+--[[
 function imprime_fila()
 	for i=1,#fila do
-		print("--------------------------------------------------------")
-		print(fila[i].tipo)
-		print(fila[i].pid)
-		print(fila[i].time)
-		print(fila[i].status)
-		print(fila[i].prioridade)
-		print("--------------------------------------------------------")
+		love.graphics.print("--------------------------------------------------------\n")
+		love.graphics.print("-------------fila prioridade node ["..i.. "]----------------------\n")
+		love.graphics.print("tipo = " .. fila[i].tipo .. "\n")
+		love.graphics.print("pid = " .. fila[i].pid .. "\n")
+		love.graphics.print("time = " .. fila[i].time .. "\n")
+		love.graphics.print("status = " .. fila[i].status .. "\n")
+		love.graphics.print("prioridade = " .. fila[i].prioridade .. "\n")
+		love.graphics.print("--------------------------------------------------------\n")
 	end
 end
 function imprimeNode_fila(indice)
 	if(indice<=#fila)then
-		print("--------------------------------------------------------")
-		print(fila[indice].tipo)
-		print(fila[indice].pid)
-		print(fila[indice].time)
-		print(fila[indice].status)
-		print(fila[indice].prioridade)
-		print("--------------------------------------------------------")
+		love.graphics.print("--------------------------------------------------------\n")
+		love.graphics.print("-------------fila prioridade node ["..indice.. "]--------------------------\n")
+		love.graphics.print("tipo = " .. fila[indice].tipo .. "\n")
+		love.graphics.print("pid = " .. fila[indice].pid .. "\n")
+		love.graphics.print("time = " .. fila[indice].time .. "\n")
+		love.graphics.print("status = " .. fila[indice].status .. "\n")
+		love.graphics.print("prioridade = " .. fila[indice].prioridade .. "\n")
+		love.graphics.print("--------------------------------------------------------\n")
 	else 
-		print("imprimindo indice null")
+		love.graphics.print("imprimindo indice null")
 	end
 end
+]]--
 function proximo_fila()
 	local temp = fila[1]
 	adiciona_fila(temp)--coloca no final da fila
@@ -177,4 +185,3 @@ end
 function espera_fila()
 	return 2
 end
-

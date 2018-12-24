@@ -4,9 +4,9 @@ local io_bound = require("processos/io")
 
 
 function love.load()
-	player1 = cpu_bound.novo(2)
-	player2 = io_bound.novo(3)
-	atual = "cpu-bound"
+	processos={};
+	atual = 0--processo atual para ser rodado
+	proximo = 1 -- processo em espera (tem que se criada uma fila)
 	tempo = os.time()
 	aux = love.math.random(1,10)
 	auxcpu = 0 -- auxiliar de cotagem de tempo cpu-bound
@@ -15,20 +15,26 @@ function love.load()
 end
 
 function love.update( dt )
+	processos[1] = cpu_bound.novo(2)
+	processos[2] = io_bound.novo(3)
+	escalonamento_loteria()
+	if(processos[atual].tipo == "cpu-bound")then
+		auxcpu = auxcpu+1/50 -- tempo que cada processo e executado
+		
+	else
+		auxio = auxio+1/50
+	end
 	-- body
 end
 
 function love.draw(  )
 	-- body
-	escalonamento_loteria()
-	if(atual == "cpu-bound")then
-		auxcpu = auxcpu+1/50 -- tempo que cada processo e executado
-		love.graphics.print("\ncpu-bound executando".."\n".."PID: "..player1.pid.."\n")
+	if(processos[atual].tipo == "cpu-bound")then
+		love.graphics.print("\ncpu-bound executando".."\n".."PID: "..processos[atual].pid.."\n")
 		love.graphics.print("temp CPU: ".. auxcpu.."\n")
 		
 	else
-		auxio = auxio+1/50
-		love.graphics.print("\nio-bound executando\n".."PID: "..player2.pid.."\n")
+		love.graphics.print("\nio-bound executando\n".."PID: "..processos[atual].pid.."\n")
 		love.graphics.print("temp CPU: "..auxio)
 	end
 	
@@ -54,14 +60,19 @@ function escalonamento_rrobin() -- funcao escalonador round-robin
 end
 
 function escalonamento_prioridades()
-	if(atual == "io-bound")then
-		if(player1.prioridade > player2.prioridade)then
-			atual = "cpu-bound"
+	if(processos[atual].tipo == "io-bound")then
+		if(processos[atual].prioridade > processos[espera].prioridade)then
+			temp = atual --variavel temporaria
+			atual = espera	-- isso tem que ser mudado pois nao posso passar o indice aqui
+							-- esse indice tem que vir de algum lugar (alguma funcao tem que dizer qual esse indice)
+			espera = temp -- tem que ser mudado teambem , ttemos que ter uma fila
 		else
-			if(player1.prioridade <= player2.prioridade)then
+			if(processos[atual].prioridade <= processos[espera].prioridade)then
 				if(os.time()-tempo>0.4)then
 					tempo =os.time()
-					atual = "cpu-bound"
+					temp = atual
+					atual = espera
+					espera = temp
 				end
 			end
 		end

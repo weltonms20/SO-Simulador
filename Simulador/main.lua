@@ -23,9 +23,11 @@ Inicia em 20/12/2018 às 00h00 e finaliza em 24/12/2018 às 23h59
 local anim8 = require 'anim8'
 local cpu_bound = require("processos/cpu")
 local io_bound = require("processos/io")
---local fila = require("fila")
-local fila={}
-local cpu = {
+--local fila = require("fila") -- nao funcionou
+
+local fila={} -- fila que guarda e processa todos os processos
+
+local cpu = { -- tabela cpu (talvez precise ai ja deixei pronta)
 	nome="juninho",
 	tempo={cpu,io}
 }
@@ -33,7 +35,7 @@ local prioridade=0
 
 
 function love.load()
-	processos={};
+	processos={}--essa tabela agora só guarda todos os processos ja criados, todo processamento eh feito na fila
 	--processos[#processos+1] = cpu_bound.novo(2)--#processos eh o tamanho do vetor
 	--processos[#processos+1] = io_bound.novo(3)
 
@@ -47,7 +49,7 @@ function love.load()
 		atual=0--significa nao fazer nada
 	end
 	if(#fila>1)then
-		espera = espera_fila()
+		espera = espera_fila() -- segundo da fila de espera 
 	else
 		espera = 0--zero significa nao fazer nada
 	end
@@ -57,7 +59,7 @@ function love.load()
 	cpu.tempo.cpu = 0 -- auxiliar de cotagem de tempo cpu-bound
 	cpu.tempo.io = 0 -- auxiliar de contagem de tempo io-bound
 
-	-------------------------------graficos--------------
+	-------------------------------graficos--------------------------------------------------
 
 	buttom = love.graphics.newImage("imagens/button.png")
 	grid_buttom = anim8.newGrid(502, 248, buttom:getWidth(), buttom:getHeight())

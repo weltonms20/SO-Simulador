@@ -5,7 +5,8 @@ function cpu_bound.novo(prioridade)
 		pid = math.random(100000,999999),
 		time = 5,
 		status = 0,
-		prioridade = prioridade
+		prioridade = prioridade,
+		token = {1,2,3}
 	}
 
 end

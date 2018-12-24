@@ -1,1 +1,2 @@
 # SO-Simulador
+# TO SEM WHATS ME CHAMA NO EMAIL

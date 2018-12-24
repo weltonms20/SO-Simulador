@@ -1,3 +1,25 @@
+--[[
+Reposição - Projeto de um Simulador dos Algoritmos de Escalonamento
+Descrição:
+Os algoritmos de escalonamento são legais, né? O objetivo dessa tarefa é meter a mão na massa e implementar 
+um simulador dos algoritmos de escalonamento!
+
+É fortemente recomendado que o simulador tenha interface gráfica e ilustre o funcionamento de um escalonador 
+de processos real. Você deve implementar os seguintes algoritmos estudados:
+
+Escalonamento por chaveamento circular (Round-robin)
+Escalonamento por prioridades
+Múltiplas Filas
+Escalonamento por loteria
+Essa reposição pode ser feita em dupla.
+
+Se o projeto puder ser acessado via web, melhor ainda. :)
+
+Período:
+Inicia em 20/12/2018 às 00h00 e finaliza em 24/12/2018 às 23h59
+]]--
+
+
 local anim8 = require 'anim8'
 local cpu_bound = require("processos/cpu")
 local io_bound = require("processos/io")

@@ -30,7 +30,8 @@ local suspensos = {}
 
 local cpu = { -- tabela cpu (talvez precise ai ja deixei pronta)
 	nome="juninho",
-	tempo={cpu,io}
+	tempo={cpu,io},
+	valid="NULL"
 }
 local prioridade=0
 
@@ -118,19 +119,19 @@ function love.draw( dt )
 		love.graphics.print("suspensos ["..i.."] "..suspensos[i].tipo.." pid = "..suspensos[i].pid.." prioridade = "..suspensos[i].prioridade,600,11*i)
 	end
 
-	love.graphics.print("tamanho da tabela de processos "..#fila,1000,0)
+	love.graphics.print("tamanho da tabela de processos "..#fila,950,0)
 	for i=1,#processos do
 		if(cursor.pos==i)then
 			love.graphics.setColor( 250,0,0)
 		else
 			love.graphics.setColor( 250,250,250)
 		end
-		love.graphics.print("["..i.."] "..processos[i].tipo.." pid = "..processos[i].pid.." status = "..processos[i].status,1000,11*i)
+		love.graphics.print("["..i.."] "..processos[i].tipo.." pid = "..processos[i].pid.." status = "..processos[i].status,950,11*i)
 	end
 	love.graphics.setColor( 250,250,250)
 ------------------------------------------------cursor ----------------------------------------------------
 	
-    love.graphics.circle("fill", 990, cursor.y, 6, 10)
+    love.graphics.circle("fill", 940, cursor.y, 6, 10)
     if(#processos==50)then
 		love.graphics.setColor( 250,0,0)
 		love.graphics.print("ATENCAO LIMITE DE PROCESSOS ALCANCADO",650,600)
@@ -140,6 +141,15 @@ function love.draw( dt )
 		love.graphics.print("CUIDADO LIMITE DE PROCESSOS EH 50",650,600)
 		love.graphics.setColor( 250,250,250)
     end
+    if(cpu.valid=="valido")then
+		love.graphics.setColor( 0,250,0)
+		love.graphics.print("COMANDO VALIDO",650,640)
+		love.graphics.setColor( 250,250,250)
+    elseif(cpu.valid=="nao_valido")then
+		love.graphics.setColor( 250,0,0)
+		love.graphics.print("COMANDO INVALIDO",650,640)
+		love.graphics.setColor( 250,250,250)
+    end
 
 
 end
@@ -147,6 +157,7 @@ end
 function love.keypressed(key)
 	if key == "c" then
 		if(#processos<50)then
+			cpu.valid = "valido"
 			processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
 			adiciona_fila(processos[#processos])
 			if(#fila<2)then
@@ -156,9 +167,12 @@ function love.keypressed(key)
 					espera = espera_fila()
 				end
 			end
+		else
+			cpu.valid = "nao_valido"
 		end
 	elseif key == "i" then
 		if(#processos<50)then
+			cpu.valid = "valido"
 			processos[#processos+1] = io_bound.novo(prioridade)
 			adiciona_fila(processos[#processos])
 			atual = primeiro_fila()
@@ -169,6 +183,8 @@ function love.keypressed(key)
 					espera = espera_fila()
 				end
 			end
+		else
+			cpu.valid = "nao_valido"
 		end
 	elseif (key == "+" or key == "kp+") then
 		prioridade=prioridade+1
@@ -186,17 +202,30 @@ function love.keypressed(key)
 		love.event.quit()
 	elseif (key == "q") then--encerrar o processo
 		if(cursor.pos>0)then
-			processos[cursor.pos].status = "encerrar"
+			if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
+				processos[cursor.pos].status = "encerrar"
+				cpu.valid = "valido"
+			else
+				cpu.valid = "nao_valido"
+			end
 		end		
 	elseif (key == "x") then--suspender o processo
 		if(cursor.pos>0)then
-			processos[cursor.pos].status = "suspender"
+			if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
+				processos[cursor.pos].status = "suspender"
+				cpu.valid = "valido"
+			else
+				cpu.valid = "nao_valido"
+			end
 		end			
 	elseif (key == "s") then--suspender o processo
 		if(cursor.pos>0 and processos[cursor.pos].status=="suspender")then
+				cpu.valid = "valido"
 			processos[cursor.pos].status = "espera"
 			remove_suspenso(processos[cursor.pos].pid)
 			adiciona_fila(processos[cursor.pos])
+		else
+			cpu.valid = "nao_valido"
 		end		
 	end
 end

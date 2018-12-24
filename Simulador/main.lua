@@ -376,7 +376,7 @@ function imprimeNode_fila(indice)
 end
 ]]--
 function proximo_fila()
-	local temp = fila[1]
+	temp = fila[1]
 	if(temp.status=="encerrar")then --remove
 		remove_processo(temp.pid)
 	elseif(temp.status=="suspender")then -- suspende

@@ -5,22 +5,37 @@ local io_bound = require("processos/io")
 
 function love.load()
 	processos={};
-	atual = 0--processo atual para ser rodado
-	proximo = 1 -- processo em espera (tem que se criada uma fila)
+	processos[#processos+1] = cpu_bound.novo(2)--#processos eh o tamanho do vetor
+	processos[#processos+1] = io_bound.novo(3)
+
+	----------------------------------------------------------------------------------------
+
+	fila={}
+	fila[#fila+1] = processos[1]
+	fila[#fila+1] = processos[2]
+
+	if(#fila>0)then
+		atual = fila[1]
+	else
+		atual=0--significa nao fazer nada
+	end
+	if(#fila>1)then
+		proximo = fila[2]
+	else
+		proximo = 0--zero significa nao fazer nada
+	end
+	----------------------------------------------------------------------------------------
 	tempo = os.time()
-	aux = love.math.random(1,10)
+	numero_random= love.math.random(1,10)
 	auxcpu = 0 -- auxiliar de cotagem de tempo cpu-bound
 	auxio = 0 -- auxiliar de contagem de tempo io-bound
 
 end
 
 function love.update( dt )
-	processos[1] = cpu_bound.novo(2)
-	processos[2] = io_bound.novo(3)
 	escalonamento_loteria()
-	if(processos[atual].tipo == "cpu-bound")then
+	if(atual~=0 and processos[atual].tipo == "cpu-bound")then
 		auxcpu = auxcpu+1/50 -- tempo que cada processo e executado
-		
 	else
 		auxio = auxio+1/50
 	end
@@ -29,7 +44,7 @@ end
 
 function love.draw(  )
 	-- body
-	if(processos[atual].tipo == "cpu-bound")then
+	if(atual~=0 and processos[atual].tipo == "cpu-bound")then
 		love.graphics.print("\ncpu-bound executando".."\n".."PID: "..processos[atual].pid.."\n")
 		love.graphics.print("temp CPU: ".. auxcpu.."\n")
 		
@@ -46,15 +61,21 @@ function sorteio()
 end
 
 function escalonamento_rrobin() -- funcao escalonador round-robin
-	if(atual == "io-bound") then
+	if(processos[atual].tipo == "io-bound") then
 		if(os.time()-tempo>0.4) then -- tempo que o I/O fica executando na CPU
 			tempo = os.time() -- quando o tempo termina a variavel tempo e atualizada 
-			atual = "cpu-bound" -- variavel atual muda
+			
+			temp = atual
+			atual = espera -- variavel atual muda
+			espera = temp 
 		end
 	else
 		if(os.time() - tempo>5) then -- tempo que o CPU-Bound fica executando na CPU
 			tempo = os.time()
-			atual = "io-bound"
+
+			temp = atual
+			atual = espera -- variavel atual muda
+			espera = temp 
 		end
 	end
 end
@@ -86,22 +107,32 @@ end
 
 function escalonamento_loteria()
 -- body
-	atual = "nada"
-	if (player1.token[aux]) then
-		atual = "cpu-bound"
+	atual = 1
+	if (processos[atual].token[aux]) then
+		atual = 1
 		love.graphics.print("\n\n\nToken sorteado: "..aux)
 		if(os.time()-tempo>5)then
 			tempo = os.time()
-			atual = "io-bound"
+
+			temp = atual
+			atual = espera
+			espera = temp
+
 			aux = love.math.random(10)
 		end
 
-	elseif(player2.token[aux])then
-			atual = "io-bound"
+	elseif(processos[espera].token[aux])then
+			temp = atual
+			atual = espera
+			espera = temp
 			love.graphics.print("\n\n\nToken sorteado: "..aux)
 			if(os.time()-tempo>1)then
 				tempo=os.time()
-				atual = "cpu-bound"
+
+				temp = atual
+				atual = espera
+				espera = temp
+
 				aux = love.math.random(10)
 			end
 	else
@@ -117,5 +148,39 @@ function escalonamento_multiplasfilas()
 end
 
 
+-------------------------SISTEMA DE FILA--------------------------
+function troca_fila(nodeA, nodeB)
+	self.fila[nodeA],self.fila[nodeB] = self.fila[nodeB],self.fila[nodeA]
+end
+function adiciona_fila(node)
+	self.fila[#fila+1] = node
+end
+function remove_fila(indice)
+	self.fila.remove(indice)
+end
+function imprime_fila()
+	for i=1,#fila do
+		print("--------------------------------------------------------")
+		print(fila[i].tipo)
+		print(fila[i].pid)
+		print(fila[i].time)
+		print(fila[i].status)
+		print(fila[i].prioridade)
+		print("--------------------------------------------------------")
+	end
+end
+function imprimeNode_fila(indice)
+	if(indice<=#fila)then
+		print("--------------------------------------------------------")
+		print(fila[indice].tipo)
+		print(fila[indice].pid)
+		print(fila[indice].time)
+		print(fila[indice].status)
+		print(fila[indice].prioridade)
+		print("--------------------------------------------------------")
+	else 
+		print("imprimindo indice null")
+	end
+end
 
 

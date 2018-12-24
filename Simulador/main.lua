@@ -46,6 +46,9 @@ function love.load()
 	----------------------------------------------------------------------------------------
 	--adiciona_fila(processos[1])
 	--adiciona_fila(processos[2])
+	--- tentativa botões -- 
+	logo = love.graphics.newImage("imagens/weltHel.png")
+	-----------------------
 
 	if(#fila>0)then
 		atual = primeiro_fila()
@@ -461,6 +464,7 @@ end
 ]]--
 
 function menu_processamento()
+	
 	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,600)
 	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,620)
 	love.graphics.print("Pressione '+' para aumentar a prioridade ",0,640)
@@ -471,8 +475,10 @@ function menu_processamento()
 	love.graphics.print("atual =  "..atual.." proximo = "..espera,0,740)
 
 	love.graphics.print("cursor.pos =  "..cursor.pos,0,760)
+
 end
 function menu_start()
+	love.graphics.draw(logo,380,60,0,0.3,0.3,0,0)
 	love.graphics.print("Pressione 'r' para Escalonamento [Round-robin]",0,600)
 	love.graphics.print("Pressione 'p' para Escalonamento por [Prioridades] ",0,620)
 	love.graphics.print("Pressione 'f' para Escalonamento por [Múltiplas Filas] ",0,640)

@@ -86,14 +86,24 @@ function love.draw( dt )
 		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..processos[atual].pid.."\n")
 		love.graphics.print("temp CPU: "..cpu.tempo.io)
 	end
+	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound ",0,500)
+	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound ",0,520)
 
 	love.graphics.print("tamanho da fila "..#fila,250,0)
 	for i=1,#fila do
 		love.graphics.print("fila ["..i.."] "..fila[i].tipo.." pid = "..fila[i].pid,250,11*i)
 	end
 
-	
-	
+end
+
+function love.keypressed(key)
+	if key == "c" then
+		processos[#processos+1] = cpu_bound.novo(2)--#processos eh o tamanho do vetor
+		adiciona_fila(processos[#processos])
+	elseif key == "i" then
+		processos[#processos+1] = io_bound.novo(2)
+		adiciona_fila(processos[#processos])
+	end
 end
 
 

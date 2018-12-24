@@ -3,6 +3,10 @@ local cpu_bound = require("processos/cpu")
 local io_bound = require("processos/io")
 --local fila = require("fila")
 local fila={}
+local cpu = {
+	nome="juninho",
+	tempo={cpu,io}
+}
 
 
 function love.load()
@@ -27,17 +31,17 @@ function love.load()
 	----------------------------------------------------------------------------------------
 	tempo = os.time()
 	numero_random= love.math.random(1,10)
-	tempo_cpu = 0 -- auxiliar de cotagem de tempo cpu-bound
-	tempo_io = 0 -- auxiliar de contagem de tempo io-bound
+	cpu.tempo.cpu = 0 -- auxiliar de cotagem de tempo cpu-bound
+	cpu.tempo.io = 0 -- auxiliar de contagem de tempo io-bound
 
 end
 
 function love.update( dt )
 	escalonamento_loteria()
 	if(atual~=0 and processos[atual].tipo == "cpu-bound")then
-		tempo_cpu = tempo_cpu+1/50 -- tempo que cada processo e executado
+		cpu.tempo.cpu = cpu.tempo.cpu+1/50 -- tempo que cada processo e executado
 	else
-		tempo_io = tempo_io+1/50
+		cpu.tempo.io = cpu.tempo.io+1/50
 	end
 	-- body
 end
@@ -45,12 +49,12 @@ end
 function love.draw(  )
 	-- body
 	if(atual~=0 and processos[atual].tipo == "cpu-bound")then
-		love.graphics.print("\ncpu-bound executando".."\n".."PID: "..processos[atual].pid.."\n")
-		love.graphics.print("temp CPU: ".. tempo_cpu.."\n")
+		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\ncpu-bound executando".."\n".."PID: "..processos[atual].pid.."\n")
+		love.graphics.print("temp CPU: ".. cpu.tempo.cpu.."\n")
 		
 	elseif(atual~=0)then
-		love.graphics.print("\nio-bound executando\n".."PID: "..processos[atual].pid.."\n")
-		love.graphics.print("temp CPU: "..tempo_io)
+		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..processos[atual].pid.."\n")
+		love.graphics.print("temp CPU: "..cpu.tempo.io)
 	end
 
 	love.graphics.print("tamanho da fila "..#fila,250,0)

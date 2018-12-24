@@ -29,6 +29,7 @@ local cpu = {
 	nome="juninho",
 	tempo={cpu,io}
 }
+local prioridade=0
 
 
 function love.load()
@@ -67,10 +68,10 @@ end
 
 function love.update( dt )
 	escalonamento_loteria()
-	if(atual~=0 and processos[atual].tipo == "cpu-bound")then
-		cpu.tempo.cpu = cpu.tempo.cpu+1/50 -- tempo que cada processo e executado
+	if(atual~=0 and processos[atual].tipo == "cpu_bound")then
+		cpu.tempo.cpu = cpu.tempo.cpu+dt -- tempo que cada processo e executado
 	else
-		cpu.tempo.io = cpu.tempo.io+1/50
+		cpu.tempo.io = cpu.tempo.io+dt
 	end
 	-- body
 end
@@ -78,16 +79,19 @@ end
 function love.draw( dt )
 	-- body
 	--button(100,100,0.3,0.3,"texto")
-	if(atual~=0 and processos[atual].tipo == "cpu-bound")then
-		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\ncpu-bound executando".."\n".."PID: "..processos[atual].pid.."\n")
+	if(atual~=0 and processos[atual].tipo == "cpu_bound")then
+		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\ncpu-bound executando\n".."PID: "..processos[atual].pid.."\ntime = "..processos[atual].time.."\n status = "..processos[atual].status.."\n prioridade = "..processos[atual].prioridade.."\n")
 		love.graphics.print("temp CPU: ".. cpu.tempo.cpu.."\n")
 		
 	elseif(atual~=0)then
-		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..processos[atual].pid.."\n")
+		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..processos[atual].pid.."\ntime = "..processos[atual].time.."\n status = "..processos[atual].status.."\n prioridade = "..processos[atual].prioridade.."\n")
 		love.graphics.print("temp CPU: "..cpu.tempo.io)
 	end
-	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound ",0,500)
-	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound ",0,520)
+	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,500)
+	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,520)
+	love.graphics.print("Pressione '+' para aumentar a prioridade ",0,540)
+	love.graphics.print("Pressione '-' para dominuir a prioridade ",0,560)
+	love.graphics.print("atual =  "..atual.." proximo = "..espera,0,580)
 
 	love.graphics.print("tamanho da fila "..#fila,250,0)
 	for i=1,#fila do
@@ -98,19 +102,23 @@ end
 
 function love.keypressed(key)
 	if key == "c" then
-		processos[#processos+1] = cpu_bound.novo(2)--#processos eh o tamanho do vetor
+		processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
 		adiciona_fila(processos[#processos])
 		atual = primeiro_fila()
 		if(#fila>1)then
 			espera = espera_fila()
 		end
 	elseif key == "i" then
-		processos[#processos+1] = io_bound.novo(2)
+		processos[#processos+1] = io_bound.novo(prioridade)
 		adiciona_fila(processos[#processos])
 		atual = primeiro_fila()
 		if(#fila>1)then
 			espera = espera_fila()
 		end
+	elseif (key == "+" or key == "kp+") then
+		prioridade=prioridade+1
+	elseif (key == "-" or key == "kp-") then
+		prioridade=prioridade-1
 	end
 end
 
@@ -122,7 +130,7 @@ function sorteio()
 end
 
 function escalonamento_rrobin() -- funcao escalonador round-robin
-	if(atual~=0 and processos[atual].tipo == "io-bound") then
+	if(atual~=0 and processos[atual].tipo == "io_bound") then
 		if(os.time()-tempo>0.4) then -- tempo que o I/O fica executando na CPU
 			tempo = os.time() -- quando o tempo termina a variavel tempo e atualizada 
 			
@@ -138,7 +146,7 @@ function escalonamento_rrobin() -- funcao escalonador round-robin
 end
 
 function escalonamento_prioridades()
-	if(atual~=0 and processos[atual].tipo == "io-bound")then
+	if(atual~=0 and processos[atual].tipo == "io_bound")then
 		if(atual~=0 and espera~=0 and processos[atual].prioridade > processos[espera].prioridade)then
 			proximo_fila()
 		else

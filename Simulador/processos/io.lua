@@ -4,7 +4,6 @@ function io_bound.novo(prioridade)
 	return{
 		tipo = "io_bound",
 		pid = math.random(100000,999999),
-		indice,
 		time = 1,
 		status = "espera",
 		prioridade = prioridade or 1,

@@ -4,7 +4,6 @@ function cpu_bound.novo(prioridade)
 	return {
 		tipo = "cpu_bound",
 		pid = math.random(100000,999999),
-		indice,
 		time = 5,
 		status = "espera",--quando botar uma variavel status bota tipo uma legenda como eu botei lá em baixo
 		prioridade = prioridade or 1,-- prioridade assume o que foi passado ou se nao foi passado assume 1

@@ -148,7 +148,6 @@ function love.keypressed(key)
 	if key == "c" then
 		if(#processos<50)then
 			processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
-			processos[#processos].indice = #processos -- setando o indice dele como o ultimo (apenas para questao de remover)
 			adiciona_fila(processos[#processos])
 			if(#fila<2)then
 				atual = primeiro_fila()
@@ -161,7 +160,6 @@ function love.keypressed(key)
 	elseif key == "i" then
 		if(#processos<50)then
 			processos[#processos+1] = io_bound.novo(prioridade)
-			processos[#processos].indice = #processos -- setando o indice dele como o ultimo (apenas para questao de remover)
 			adiciona_fila(processos[#processos])
 			atual = primeiro_fila()
 			if(#fila<2)then
@@ -322,7 +320,7 @@ end
 function proximo_fila()
 	local temp = fila[1]
 	if(temp.status=="encerrar")then --remove
-		table.remove(processos,temp.indice)
+		remove_processo(temp.pid)
 	elseif(temp.status=="suspender")then -- suspende
 		suspensos[#suspensos+1] = temp
 	elseif(temp.status=="processando")then
@@ -350,6 +348,14 @@ function remove_suspenso(id)
 	for i=1,#suspensos do
 		if(suspensos[i].pid==id)then
 			table.remove(suspensos,i)
+			return
+		end
+	end
+end
+function remove_processo(id)
+	for i=1,#processos do
+		if(processos[i].pid==id)then
+			table.remove(processos,i)
 			return
 		end
 	end

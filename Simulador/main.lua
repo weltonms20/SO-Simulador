@@ -61,7 +61,7 @@ function love.load()
 
 	buttom = love.graphics.newImage("imagens/button.png")
 	grid_buttom = anim8.newGrid(502, 248, buttom:getWidth(), buttom:getHeight())
-	anim = anim8.newAnimation(grid_buttom('1-2',1), 0.1)
+	anim = anim8.newAnimation(grid_buttom('1-2',1), 0.1,"pauseAtStart")
 
 
 end

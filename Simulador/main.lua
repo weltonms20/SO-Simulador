@@ -31,7 +31,7 @@ local suspensos = {}
 local cpu = { -- tabela cpu (talvez precise ai ja deixei pronta)
 	nome="juninho",
 	status="esperando",
-	tipo_escalonamento=nil,
+	tipo=nil,
 	tempo={cpu,io},
 	valid="NULL"
 }
@@ -68,9 +68,14 @@ function love.load()
 
 	-------------------------------graficos--------------------------------------------------
 	cursor = {y=6,base_y=11,pos=1}
-	buttom = love.graphics.newImage("imagens/button.png")
-	grid_buttom = anim8.newGrid(502, 248, buttom:getWidth(), buttom:getHeight())
-	anim = anim8.newAnimation(grid_buttom('1-2',1), 0.1,"pauseAtStart")
+	buttom = love.graphics.newImage("imagens/button_blue.png")
+	buttom_rr = { img = love.graphics.newImage("imagens/button_rr.png"), x=110,y=650}
+	buttom_mf = { img =  love.graphics.newImage("imagens/button_mf.png"), x=700,y=650}
+	buttom_pr = { img =  love.graphics.newImage("imagens/button_prioridades.png"), x=400,y=650}
+	buttom_l = { img =  love.graphics.newImage("imagens/button_loteria.png"), x=1000,y=650}
+
+	buttom_w=buttom:getWidth()
+	buttom_h=buttom:getHeight()
 
 
 end
@@ -111,11 +116,11 @@ function love.draw( dt )
 	end
 	--button(100,100,0.3,0.3,"texto")
 	if(atual~=0 and fila[atual].tipo == "cpu_bound")then
-		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\ncpu-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
+		love.graphics.print("\nNOME DA CPU = "..cpu.nome.." tipo = "..cpu.tipo.."\ncpu-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
 		love.graphics.print("temp CPU: ".. cpu.tempo.cpu.."\n")
 		
 	elseif(atual~=0)then
-		love.graphics.print("\nNOME DA CPU = "..cpu.nome.."\nio-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
+		love.graphics.print("\nNOME DA CPU = "..cpu.nome.." tipo = "..cpu.tipo.."\nio-bound executando\n".."PID: "..fila[atual].pid.."\ntime = "..fila[atual].time.."\n status = "..fila[atual].status.."\n prioridade = "..fila[atual].prioridade.."\n")
 		love.graphics.print("temp CPU: "..cpu.tempo.io)
 	end
 
@@ -239,23 +244,29 @@ function love.keypressed(key)
 				cpu.valid = "nao_valido"
 			end		
 		end
-	elseif(cpu.status=="esperando")then
-		if (key == "l") then
-			cpu.tipo="Loteria"
-			cpu.status="executando"
-		elseif (key == "r")then
-			cpu.tipo="Round-robin"
-			cpu.status="executando"
-		elseif (key == "p") then
-			cpu.tipo="Prioridades"
-			cpu.status="executando"
-		elseif (key == "f") then
-			cpu.tipo="Filas"
-			cpu.status="executando"
-		end
 	end
 	if (key == "escape") then--encerra independente de estado
 		love.event.quit()
+	end
+end
+
+function love.mousepressed(x, y, button)
+	if(cpu.status=="executando")then
+
+	elseif(cpu.status=="esperando")then
+		if (x >= buttom_rr.x) and (x<=buttom_rr.x+buttom_w) and (y>=buttom_rr.y) and (y<=buttom_rr.y+buttom_h) and button == 1 then -- robin
+			cpu.tipo="Round-robin"
+			cpu.status="executando"
+		elseif (x >= buttom_pr.x) and (x<=buttom_pr.x+buttom_w) and (y>=buttom_pr.y) and (y<=buttom_pr.y+buttom_h) and button == 1 then -- prior
+			cpu.tipo="Prioridades"
+			cpu.status="executando"
+		elseif (x >= buttom_mf.x) and (x<=buttom_mf.x+buttom_w) and (y>=buttom_mf.y) and (y<=buttom_mf.y+buttom_h) and button == 1 then -- fila
+			cpu.tipo="Filas"
+			cpu.status="executando"
+		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
+			cpu.tipo="Loteria"
+			cpu.status="executando"
+		end
 	end
 end
 
@@ -376,24 +387,27 @@ function imprimeNode_fila(indice)
 end
 ]]--
 function proximo_fila()
-	temp = fila[1]
-	if(temp.status=="encerrar")then --remove
-		remove_processo(temp.pid)
-	elseif(temp.status=="suspender")then -- suspende
-		suspensos[#suspensos+1] = temp
-	elseif(temp.status=="processando")then
-		adiciona_fila(temp)--coloca no final da fila
-		fila[#fila].status = "espera"
+	if(#fila>0)then
+		temp = fila[1]
+		if(temp.status=="encerrar")then --remove
+			remove_processo(temp.pid)
+		elseif(temp.status=="suspender")then -- suspende
+			suspensos[#suspensos+1] = temp
+		elseif(temp.status=="processando")then
+			temp.status = "espera"
+			adiciona_fila(temp)--coloca no final da fila
+			--fila[#fila].status = "espera"
+		end
+		remove_fila(1)--remove o primeiro da fila
+		if(fila[1].status=="encerrar")then -- remove esse processo
+			proximo_fila() -- pula esse processo
+		elseif(fila[1].status=="suspender")then -- suspende tal processo
+			proximo_fila() -- pula esse processo
+		elseif(fila[1].status=="espera")then
+			fila[1].status = "processando"
+		end
+		return fila[1] --retorna o proximo
 	end
-	remove_fila(1)--remove o primeiro da fila
-	if(fila[1].status=="encerrar")then -- remove esse processo
-		proximo_fila() -- pula esse processo
-	elseif(fila[1].status=="suspender")then -- suspende tal processo
-		proximo_fila() -- pula esse processo
-	elseif(fila[1].status=="espera")then
-		fila[1].status = "processando"
-	end
-	return fila[1] --retorna o proximo
 end
 function primeiro_fila()
 	return 1
@@ -478,10 +492,14 @@ function menu_processamento()
 
 end
 function menu_start()
-	love.graphics.draw(logo,380,60,0,0.3,0.3,0,0)
-	love.graphics.print("Pressione 'r' para Escalonamento [Round-robin]",0,600)
-	love.graphics.print("Pressione 'p' para Escalonamento por [Prioridades] ",0,620)
-	love.graphics.print("Pressione 'f' para Escalonamento por [Múltiplas Filas] ",0,640)
-	love.graphics.print("Pressione 'l' para Escalonamento por [Loteria] ",0,660)
+	love.graphics.draw(logo,380,60,0,0.3,0.2,0,0)
+	love.graphics.draw(buttom_rr.img,buttom_rr.x,buttom_rr.y)
+	--love.graphics.print("Pressione 'r' para Escalonamento [Round-robin]",0,600)
+	--love.graphics.print("Pressione 'p' para Escalonamento por [Prioridades] ",0,620)
+	love.graphics.draw(buttom_pr.img,buttom_pr.x,buttom_pr.y)
+	--love.graphics.print("Pressione 'f' para Escalonamento por [Múltiplas Filas] ",0,640)
+	love.graphics.draw(buttom_mf.img,buttom_mf.x,buttom_mf.y)
+	--love.graphics.print("Pressione 'l' para Escalonamento por [Loteria] ",0,660)
+	love.graphics.draw(buttom_l.img,buttom_l.x,buttom_l.y)
 
 end

@@ -142,6 +142,8 @@ function love.draw( dt )
 		love.graphics.print("temp CPU: "..cpu.tempo.io)
 	end
 
+
+
 	love.graphics.print("Pressione Esq para terminar a simulação",0,780)
 
 --------------------------------------------------filas e processos -------------------------------------
@@ -374,7 +376,7 @@ end
 function escalonamento_loteria()
 -- body
 	if (atual~=0 and fila[atual].token[numero_random]) then
-		love.graphics.print("\n\n\nToken sorteado: "..numero_random)
+		love.graphics.print("\n\n\n\n\n\n\n\nToken sorteado: "..numero_random)
 		if(os.time()-tempo>5)then
 			tempo = os.time()
 
@@ -385,7 +387,7 @@ function escalonamento_loteria()
 
 	elseif(espera~=0 and fila[espera].token[numero_random])then
 			proximo_fila()
-			love.graphics.print("\n\n\nToken sorteado: "..numero_random)
+			love.graphics.print("\n\n\n\n\n\n\n\nToken sorteado: "..numero_random)
 			if(os.time()-tempo>1)then
 				tempo=os.time()
 

@@ -285,33 +285,24 @@ function love.mousepressed(x, y, button)
 	love.graphics.draw(buttom_mais_io.img,buttom_mais_io.x,buttom_mais_io.y)
 	]]
 	if(cpu.status=="executando")then
-		if (x >= buttom_rr.x) and (x<=buttom_rr.x+buttom_w) and (y>=buttom_rr.y) and (y<=buttom_rr.y+buttom_h) and button == 1 then -- robin
-			cpu.tipo="Round-robin"
-			cpu.status="executando"
-		elseif (x >= buttom_pr.x) and (x<=buttom_pr.x+buttom_w) and (y>=buttom_pr.y) and (y<=buttom_pr.y+buttom_h) and button == 1 then -- prior
-			cpu.tipo="Prioridades"
-			cpu.status="executando"
-		elseif (x >= buttom_mf.x) and (x<=buttom_mf.x+buttom_w) and (y>=buttom_mf.y) and (y<=buttom_mf.y+buttom_h) and button == 1 then -- fila
-			cpu.tipo="Filas"
-			cpu.status="executando"
-		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
-			cpu.tipo="Loteria"
-			cpu.status="executando"
-		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
-			cpu.tipo="Loteria"
-			cpu.status="executando"
-		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
-			cpu.tipo="Loteria"
-			cpu.status="executando"
-		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
-			cpu.tipo="Loteria"
-			cpu.status="executando"
-		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
-			cpu.tipo="Loteria"
-			cpu.status="executando"
-		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
-			cpu.tipo="Loteria"
-			cpu.status="executando"
+		if (x >= buttom_cpu.x) and (x<=buttom_cpu.x+buttom_w) and (y>=buttom_cpu.y) and (y<=buttom_cpu.y+buttom_h) and button == 1 then -- 
+			
+		elseif (x >= buttom_io.x) and (x<=buttom_io.x+buttom_w) and (y>=buttom_io.y) and (y<=buttom_io.y+buttom_h) and button == 1 then -- 
+			
+		elseif (x >= buttom_encerrar.x) and (x<=buttom_encerrar.x+buttom_w) and (y>=buttom_encerrar.y) and (y<=buttom_encerrar.y+buttom_h) and button == 1 then -- 
+			
+		elseif (x >= buttom_suspende.x) and (x<=buttom_suspende.x+buttom_w) and (y>=buttom_suspende.y) and (y<=buttom_suspende.y+buttom_h) and button == 1 then -- 
+			
+		elseif (x >= buttom_retomar.x) and (x<=buttom_retomar.x+buttom_w) and (y>=buttom_retomar.y) and (y<=buttom_retomar.y+buttom_h) and button == 1 then -- 
+			
+		elseif (x >= buttom_mais_cpu.x) and (x<=buttom_mais_cpu.x+buttom_w) and (y>=buttom_mais_cpu.y) and (y<=buttom_mais_cpu.y+buttom_h) and button == 1 then -- 
+			
+		elseif (x >= buttom_mais_io.x) and (x<=buttom_mais_io.x+buttom_w) and (y>=buttom_mais_io.y) and (y<=buttom_mais_io.y+buttom_h) and button == 1 then -- 
+			
+		elseif (x >= buttom_menos_cpu.x) and (x<=buttom_menos_cpu.x+buttom_w) and (y>=buttom_menos_cpu.y) and (y<=buttom_menos_cpu.y+buttom_h) and button == 1 then -- 
+			
+		elseif (x >= buttom_menos_io.x) and (x<=buttom_menos_io.x+buttom_w) and (y>=buttom_menos_io.y) and (y<=buttom_menos_io.y+buttom_h) and button == 1 then -- 
+			
 		end
 	elseif(cpu.status=="esperando")then
 		if (x >= buttom_rr.x) and (x<=buttom_rr.x+buttom_w) and (y>=buttom_rr.y) and (y<=buttom_rr.y+buttom_h) and button == 1 then -- robin

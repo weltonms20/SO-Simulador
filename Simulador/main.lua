@@ -194,40 +194,9 @@ end
 function love.keypressed(key)
 	if(cpu.status=="executando")then
 		if key == "c" then
-			if(#processos<50)then
-				cpu.valid = "valido"
-				processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
-				adiciona_fila(processos[#processos])
-				if(#fila<2)then
-					atual = primeiro_fila()
-					fila[atual].status = "processando"
-					if(#fila>1)then
-						espera = espera_fila()
-					end
-				end
-			else
-				cpu.valid = "nao_valido"
-			end
 		elseif key == "i" then
-			if(#processos<50)then
-				cpu.valid = "valido"
-				processos[#processos+1] = io_bound.novo(prioridade)
-				adiciona_fila(processos[#processos])
-				atual = primeiro_fila()
-				if(#fila<2)then
-					atual = primeiro_fila()
-					fila[atual].status = "processando"
-					if(#fila>1)then
-						espera = espera_fila()
-					end
-				end
-			else
-				cpu.valid = "nao_valido"
-			end
 		elseif (key == "+" or key == "kp+") then
-			prioridade=prioridade+1
 		elseif (key == "-" or key == "kp-") then
-			prioridade=prioridade-1
 		elseif (key == "up") then
 			if(cursor.pos>1)then
 				cursor.pos = cursor.pos-1
@@ -237,32 +206,8 @@ function love.keypressed(key)
 				cursor.pos = cursor.pos+1
 			end
 		elseif (key == "q") then--encerrar o processo
-			if(cursor.pos>0)then
-				if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
-					processos[cursor.pos].status = "encerrar"
-					cpu.valid = "valido"
-				else
-					cpu.valid = "nao_valido"
-				end
-			end		
-		elseif (key == "x") then--suspender o processo
-			if(cursor.pos>0)then
-				if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
-					processos[cursor.pos].status = "suspender"
-					cpu.valid = "valido"
-				else
-					cpu.valid = "nao_valido"
-				end
-			end			
-		elseif (key == "s") then--suspender o processo
-			if(cursor.pos>0 and processos[cursor.pos].status=="suspender")then
-					cpu.valid = "valido"
-				processos[cursor.pos].status = "espera"
-				remove_suspenso(processos[cursor.pos].pid)
-				adiciona_fila(processos[cursor.pos])
-			else
-				cpu.valid = "nao_valido"
-			end		
+		elseif (key == "x") then--suspender o processo	
+		elseif (key == "s") then--revive o processo
 		end
 	end
 	if (key == "escape") then--encerra independente de estado
@@ -285,23 +230,75 @@ function love.mousepressed(x, y, button)
 	love.graphics.draw(buttom_mais_io.img,buttom_mais_io.x,buttom_mais_io.y)
 	]]
 	if(cpu.status=="executando")then
-		if (x >= buttom_cpu.x) and (x<=buttom_cpu.x+buttom_w) and (y>=buttom_cpu.y) and (y<=buttom_cpu.y+buttom_h) and button == 1 then -- 
-			
-		elseif (x >= buttom_io.x) and (x<=buttom_io.x+buttom_w) and (y>=buttom_io.y) and (y<=buttom_io.y+buttom_h) and button == 1 then -- 
-			
-		elseif (x >= buttom_encerrar.x) and (x<=buttom_encerrar.x+buttom_w) and (y>=buttom_encerrar.y) and (y<=buttom_encerrar.y+buttom_h) and button == 1 then -- 
-			
-		elseif (x >= buttom_suspende.x) and (x<=buttom_suspende.x+buttom_w) and (y>=buttom_suspende.y) and (y<=buttom_suspende.y+buttom_h) and button == 1 then -- 
-			
+		if (x >= buttom_cpu.x) and (x<=buttom_cpu.x+buttom_w) and (y>=buttom_cpu.y) and (y<=buttom_cpu.y+buttom_h) and button == 1 then -- cpu
+			if(#processos<50)then
+				cpu.valid = "valido"
+				processos[#processos+1] = cpu_bound.novo(prioridade)--#processos eh o tamanho do vetor
+				adiciona_fila(processos[#processos])
+				if(#fila<2)then
+					atual = primeiro_fila()
+					fila[atual].status = "processando"
+					if(#fila>1)then
+						espera = espera_fila()
+					end
+				end
+			else
+				cpu.valid = "nao_valido"
+			end
+		elseif (x >= buttom_io.x) and (x<=buttom_io.x+buttom_w) and (y>=buttom_io.y) and (y<=buttom_io.y+buttom_h) and button == 1 then -- io
+			if(#processos<50)then
+				cpu.valid = "valido"
+				processos[#processos+1] = io_bound.novo(prioridade)
+				adiciona_fila(processos[#processos])
+				atual = primeiro_fila()
+				if(#fila<2)then
+					atual = primeiro_fila()
+					fila[atual].status = "processando"
+					if(#fila>1)then
+						espera = espera_fila()
+					end
+				end
+			else
+				cpu.valid = "nao_valido"
+			end
+		elseif (x >= buttom_encerrar.x) and (x<=buttom_encerrar.x+buttom_w) and (y>=buttom_encerrar.y) and (y<=buttom_encerrar.y+buttom_h) and button == 1 then -- encerrar processo
+			if(cursor.pos>0)then
+				if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
+					processos[cursor.pos].status = "encerrar"
+					cpu.valid = "valido"
+				else
+					cpu.valid = "nao_valido"
+				end
+			end		
+		elseif (x >= buttom_suspende.x) and (x<=buttom_suspende.x+buttom_w) and (y>=buttom_suspende.y) and (y<=buttom_suspende.y+buttom_h) and button == 1 then -- suspende processo
+			if(cursor.pos>0)then
+				if(processos[cursor.pos].status ~= "processando")then--para nao matar um processo em execussao
+					processos[cursor.pos].status = "suspender"
+					cpu.valid = "valido"
+				else
+					cpu.valid = "nao_valido"
+				end
+			end		
 		elseif (x >= buttom_retomar.x) and (x<=buttom_retomar.x+buttom_w) and (y>=buttom_retomar.y) and (y<=buttom_retomar.y+buttom_h) and button == 1 then -- 
-			
+			if(cursor.pos>0 and processos[cursor.pos].status=="suspender")then
+				cpu.valid = "valido"
+				processos[cursor.pos].status = "espera"
+				remove_suspenso(processos[cursor.pos].pid)
+				adiciona_fila(processos[cursor.pos])
+			else
+				cpu.valid = "nao_valido"
+			end		
 		elseif (x >= buttom_mais_cpu.x) and (x<=buttom_mais_cpu.x+buttom_w) and (y>=buttom_mais_cpu.y) and (y<=buttom_mais_cpu.y+buttom_h) and button == 1 then -- 
+			prioridade=prioridade+1
 			
 		elseif (x >= buttom_mais_io.x) and (x<=buttom_mais_io.x+buttom_w) and (y>=buttom_mais_io.y) and (y<=buttom_mais_io.y+buttom_h) and button == 1 then -- 
+			prioridade=prioridade+1
 			
 		elseif (x >= buttom_menos_cpu.x) and (x<=buttom_menos_cpu.x+buttom_w) and (y>=buttom_menos_cpu.y) and (y<=buttom_menos_cpu.y+buttom_h) and button == 1 then -- 
+			prioridade=prioridade-1
 			
 		elseif (x >= buttom_menos_io.x) and (x<=buttom_menos_io.x+buttom_w) and (y>=buttom_menos_io.y) and (y<=buttom_menos_io.y+buttom_h) and button == 1 then -- 
+			prioridade=prioridade-1
 			
 		end
 	elseif(cpu.status=="esperando")then
@@ -479,7 +476,7 @@ function menu_processamento()
 	--love.graphics.print("Pressione 'x' para suspendere () o processo  ",0,680)
 	--love.graphics.print("Pressione 'q' para encerrar (quit) o processo  ",0,700)
 	--love.graphics.print("Pressione 's' para retomar um processo suspenso ",0,720)
-	love.graphics.print("atual =  "..atual.." proximo = "..espera,0,740)
+	love.graphics.print("prioridade =  "..prioridade,0,740)
 
 	love.graphics.print("cursor.pos =  "..cursor.pos,0,760)
 

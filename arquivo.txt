@@ -1,0 +1,16 @@
+https://github.com/weltonms20/SO-Simulador
+linguagem : LUA
+interface : LOVE2D
+animacao (se eu colocar) : ANIM8 (biblioteca)
+
+WELTON MARINHO DE SOUZA
+Matrícula: 2015021673 
+
+HELTER BRUNO DA PAIXAO PINHEIRO
+Matrícula: 2014059611 
+
+
+
+OBS : ainda não está pronto, como o prazo foi adiado até amanhã, vamos alterar algumas coisas ainda.
+(mas pra nao esquecer de mandar mandei logo)
+OBS 2 : ainda vou gerar o executável, vai ter um .exe pra executar (se eu nao conseguir vai ter instruções)

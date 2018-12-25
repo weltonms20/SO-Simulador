@@ -288,16 +288,16 @@ function love.mousepressed(x, y, button)
 			else
 				cpu.valid = "nao_valido"
 			end		
-		elseif (x >= buttom_mais_cpu.x) and (x<=buttom_mais_cpu.x+buttom_w) and (y>=buttom_mais_cpu.y) and (y<=buttom_mais_cpu.y+buttom_h) and button == 1 then -- 
+		elseif (x >= buttom_mais_cpu.x) and (x<=buttom_mais_cpu.x+buttom2_w) and (y>=buttom_mais_cpu.y) and (y<=buttom_mais_cpu.y+buttom2_h) and button == 1 then -- 
 			prioridade=prioridade+1
 			
-		elseif (x >= buttom_mais_io.x) and (x<=buttom_mais_io.x+buttom_w) and (y>=buttom_mais_io.y) and (y<=buttom_mais_io.y+buttom_h) and button == 1 then -- 
+		elseif (x >= buttom_mais_io.x) and (x<=buttom_mais_io.x+buttom2_w) and (y>=buttom_mais_io.y) and (y<=buttom_mais_io.y+buttom2_h) and button == 1 then -- 
 			prioridade=prioridade+1
 			
-		elseif (x >= buttom_menos_cpu.x) and (x<=buttom_menos_cpu.x+buttom_w) and (y>=buttom_menos_cpu.y) and (y<=buttom_menos_cpu.y+buttom_h) and button == 1 then -- 
+		elseif (x >= buttom_menos_cpu.x) and (x<=buttom_menos_cpu.x+buttom2_w) and (y>=buttom_menos_cpu.y) and (y<=buttom_menos_cpu.y+buttom2_h) and button == 1 then -- 
 			prioridade=prioridade-1
 			
-		elseif (x >= buttom_menos_io.x) and (x<=buttom_menos_io.x+buttom_w) and (y>=buttom_menos_io.y) and (y<=buttom_menos_io.y+buttom_h) and button == 1 then -- 
+		elseif (x >= buttom_menos_io.x) and (x<=buttom_menos_io.x+buttom2_w) and (y>=buttom_menos_io.y) and (y<=buttom_menos_io.y+buttom2_h) and button == 1 then -- 
 			prioridade=prioridade-1
 			
 		end

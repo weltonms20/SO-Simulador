@@ -69,13 +69,31 @@ function love.load()
 	-------------------------------graficos--------------------------------------------------
 	cursor = {y=6,base_y=11,pos=1}
 	buttom = love.graphics.newImage("imagens/button_blue.png")
+	buttom2 = love.graphics.newImage("imagens/button_blue2.png")
+
+	buttom_w=buttom:getWidth()
+	buttom_h=buttom:getHeight()
+
+	buttom2_w=buttom2:getWidth()
+	buttom2_h=buttom2:getHeight()
+
+
 	buttom_rr = { img = love.graphics.newImage("imagens/button_rr.png"), x=110,y=650}
 	buttom_mf = { img =  love.graphics.newImage("imagens/button_mf.png"), x=700,y=650}
 	buttom_pr = { img =  love.graphics.newImage("imagens/button_prioridades.png"), x=400,y=650}
 	buttom_l = { img =  love.graphics.newImage("imagens/button_loteria.png"), x=1000,y=650}
 
-	buttom_w=buttom:getWidth()
-	buttom_h=buttom:getHeight()
+	buttom_cpu = { img = love.graphics.newImage("imagens/button_cpu_bound.png"), x=110,y=650}
+	buttom_io = { img =  love.graphics.newImage("imagens/button_io_bound.png"), x=110,y=850}
+
+	buttom_mais_cpu = { img =  love.graphics.newImage("imagens/button_mais.png"), x=buttom_cpu.x+buttom_w,y=buttom_cpu.y}
+	buttom_menos_cpu = { img = love.graphics.newImage("imagens/button_menos.png"), x=buttom_cpu.x+buttom_w,y=buttom_cpu.y+(buttom_h/2)+1}
+	buttom_mais_io = { img =  love.graphics.newImage("imagens/button_mais.png"), x=buttom_io.x+buttom_w,y=buttom_io.y}
+	buttom_menos_io = { img = love.graphics.newImage("imagens/button_menos.png"), x=buttom_io.x+buttom_w,y=buttom_io.y+(buttom_h/2)+1}
+
+	buttom_encerrar = { img =  love.graphics.newImage("imagens/button_encerrar.png"), x=600,y=650}
+	buttom_suspende = { img =  love.graphics.newImage("imagens/button_suspender.png"), x=900,y=650}
+	buttom_retomar = { img =  love.graphics.newImage("imagens/button_retomar.png"), x=900,y=850}
 
 
 end
@@ -251,8 +269,48 @@ function love.keypressed(key)
 end
 
 function love.mousepressed(x, y, button)
-	if(cpu.status=="executando")then
+	--[[
+	love.graphics.draw(buttom_cpu.img,buttom_cpu.x,buttom_cpu.y)
+	love.graphics.draw(buttom_io.img,buttom_io.x,buttom_io.y)
+	love.graphics.draw(buttom_encerrar.img,buttom_encerrar.x,buttom_encerrar.y)
+	love.graphics.draw(buttom_suspende.img,buttom_suspende.x,buttom_suspende.y)
+	love.graphics.draw(buttom_retomar.img,buttom_retomar.x,buttom_retomar.y)
 
+	love.graphics.draw(buttom_menos_cpu.img,buttom_menos_cpu.x,buttom_menos_cpu.y)
+	love.graphics.draw(buttom_menos_io.img,buttom_menos_io.x,buttom_menos_io.y)
+
+	love.graphics.draw(buttom_mais_cpu.img,buttom_mais_cpu.x,buttom_mais_cpu.y)
+	love.graphics.draw(buttom_mais_io.img,buttom_mais_io.x,buttom_mais_io.y)
+	]]
+	if(cpu.status=="executando")then
+		if (x >= buttom_rr.x) and (x<=buttom_rr.x+buttom_w) and (y>=buttom_rr.y) and (y<=buttom_rr.y+buttom_h) and button == 1 then -- robin
+			cpu.tipo="Round-robin"
+			cpu.status="executando"
+		elseif (x >= buttom_pr.x) and (x<=buttom_pr.x+buttom_w) and (y>=buttom_pr.y) and (y<=buttom_pr.y+buttom_h) and button == 1 then -- prior
+			cpu.tipo="Prioridades"
+			cpu.status="executando"
+		elseif (x >= buttom_mf.x) and (x<=buttom_mf.x+buttom_w) and (y>=buttom_mf.y) and (y<=buttom_mf.y+buttom_h) and button == 1 then -- fila
+			cpu.tipo="Filas"
+			cpu.status="executando"
+		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
+			cpu.tipo="Loteria"
+			cpu.status="executando"
+		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
+			cpu.tipo="Loteria"
+			cpu.status="executando"
+		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
+			cpu.tipo="Loteria"
+			cpu.status="executando"
+		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
+			cpu.tipo="Loteria"
+			cpu.status="executando"
+		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
+			cpu.tipo="Loteria"
+			cpu.status="executando"
+		elseif (x >= buttom_l.x) and (x<=buttom_l.x+buttom_w) and (y>=buttom_l.y) and (y<=buttom_l.y+buttom_h) and button == 1 then -- loteria
+			cpu.tipo="Loteria"
+			cpu.status="executando"
+		end
 	elseif(cpu.status=="esperando")then
 		if (x >= buttom_rr.x) and (x<=buttom_rr.x+buttom_w) and (y>=buttom_rr.y) and (y<=buttom_rr.y+buttom_h) and button == 1 then -- robin
 			cpu.tipo="Round-robin"
@@ -358,34 +416,6 @@ end
 function remove_fila(indice)
 	table.remove(fila, indice)
 end
---[[
-function imprime_fila()
-	for i=1,#fila do
-		love.graphics.print("--------------------------------------------------------\n")
-		love.graphics.print("-------------fila prioridade node ["..i.. "]----------------------\n")
-		love.graphics.print("tipo = " .. fila[i].tipo .. "\n")
-		love.graphics.print("pid = " .. fila[i].pid .. "\n")
-		love.graphics.print("time = " .. fila[i].time .. "\n")
-		love.graphics.print("status = " .. fila[i].status .. "\n")
-		love.graphics.print("prioridade = " .. fila[i].prioridade .. "\n")
-		love.graphics.print("--------------------------------------------------------\n")
-	end
-end
-function imprimeNode_fila(indice)
-	if(indice<=#fila)then
-		love.graphics.print("--------------------------------------------------------\n")
-		love.graphics.print("-------------fila prioridade node ["..indice.. "]--------------------------\n")
-		love.graphics.print("tipo = " .. fila[indice].tipo .. "\n")
-		love.graphics.print("pid = " .. fila[indice].pid .. "\n")
-		love.graphics.print("time = " .. fila[indice].time .. "\n")
-		love.graphics.print("status = " .. fila[indice].status .. "\n")
-		love.graphics.print("prioridade = " .. fila[indice].prioridade .. "\n")
-		love.graphics.print("--------------------------------------------------------\n")
-	else 
-		love.graphics.print("imprimindo indice null")
-	end
-end
-]]--
 function proximo_fila()
 	if(#fila>0)then
 		temp = fila[1]
@@ -434,66 +464,28 @@ function remove_processo(id)
 end
 
 
--- ------------------------FUNCOES GRAFICAS-----------------------------
---[[
-function colisao(obj1X, obj1Y, obj1W, obj1H, obj2X, obj2Y)
-	if (obj2X>obj1X ) then
-		--if(obj2Y>obj1Y and obj2Y < (obj1Y+obj1H)) then
-			return 1
-		--end
-	else
-		return 0
-	end
-end
-
-function button(x,y,w,h,texto,event,param1,param2)
-	--desenha botao
-	love.graphics.print("\n x = "..love.mouse.getX().."\n",300,400)
-	love.graphics.print("\n yfilae.mouse.getY().."\n",300,420)
-	love.graphics.print("\n x = "..x.."\n",300,440)
-	love.graphics.print(" y = "..y.."\n",300,480)
-	anim:draw(buttom, x, y,0,w,h)
-	local mx, my = love.mouse.getPosition( )
-	if(colisao(x,y,250,72,mx,my))then
-		love.graphics.print("\n colisao\n",300,500)
-		--anim:update(dt)	
-		if(not event)then
-			return
-		end
-		if((not param1) and (not param2))then
-			event()
-		elseif((not param2))then
-			event(param1)
-		elseif((not param1))then
-			event(param2)
-		elseif(param1 and param2)then
-			event(param1,param2)
-		end
-	end
-
-end
-function new_button(x,y,w,h,texto,evento,param1,param2)
-	-- body
-end
-]]--
-
 function menu_processamento()
 	
-	love.graphics.draw(buttom_rr.img,buttom_rr.x,buttom_rr.y)
-	love.graphics.draw(buttom_pr.img,buttom_pr.x,buttom_pr.y)
-	love.graphics.draw(buttom_mf.img,buttom_mf.x,buttom_mf.y)
-	love.graphics.draw(buttom_l.img,buttom_l.x,buttom_l.y)
-	love.graphics.draw(buttom_rr.img,buttom_rr.x,buttom_rr.y)
-	love.graphics.draw(buttom_pr.img,buttom_pr.x,buttom_pr.y)
-	love.graphics.draw(buttom_mf.img,buttom_mf.x,buttom_mf.y)
-	love.graphics.draw(buttom_l.img,buttom_l.x,buttom_l.y)
-	love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,600)
-	love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,620)
-	love.graphics.print("Pressione '+' para aumentar a prioridade ",0,640)
-	love.graphics.print("Pressione '-' para dominuir a prioridade ",0,660)
-	love.graphics.print("Pressione 'x' para suspendere () o processo  ",0,680)
-	love.graphics.print("Pressione 'q' para encerrar (quit) o processo  ",0,700)
-	love.graphics.print("Pressione 's' para retomar um processo suspenso ",0,720)
+	love.graphics.draw(buttom_cpu.img,buttom_cpu.x,buttom_cpu.y)
+	love.graphics.draw(buttom_io.img,buttom_io.x,buttom_io.y)
+	love.graphics.draw(buttom_encerrar.img,buttom_encerrar.x,buttom_encerrar.y)
+	love.graphics.draw(buttom_suspende.img,buttom_suspende.x,buttom_suspende.y)
+	love.graphics.draw(buttom_retomar.img,buttom_retomar.x,buttom_retomar.y)
+
+	love.graphics.draw(buttom_menos_cpu.img,buttom_menos_cpu.x,buttom_menos_cpu.y)
+	love.graphics.draw(buttom_menos_io.img,buttom_menos_io.x,buttom_menos_io.y)
+
+	love.graphics.draw(buttom_mais_cpu.img,buttom_mais_cpu.x,buttom_mais_cpu.y)
+	love.graphics.draw(buttom_mais_io.img,buttom_mais_io.x,buttom_mais_io.y)
+
+
+	--love.graphics.print("Pressione 'c' para adicionar um novo processo de CPU_Bound com prioridade "..prioridade,0,600)
+	--love.graphics.print("Pressione 'i' para adicionar um novo processo de IO_Bound com prioridade "..prioridade,0,620)
+	--love.graphics.print("Pressione '+' para aumentar a prioridade ",0,640)
+	--love.graphics.print("Pressione '-' para dominuir a prioridade ",0,660)
+	--love.graphics.print("Pressione 'x' para suspendere () o processo  ",0,680)
+	--love.graphics.print("Pressione 'q' para encerrar (quit) o processo  ",0,700)
+	--love.graphics.print("Pressione 's' para retomar um processo suspenso ",0,720)
 	love.graphics.print("atual =  "..atual.." proximo = "..espera,0,740)
 
 	love.graphics.print("cursor.pos =  "..cursor.pos,0,760)
